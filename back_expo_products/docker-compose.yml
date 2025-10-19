@@ -1,0 +1,46 @@
+version: '3'
+services:
+  db-postgres:
+    container_name: db-demo
+    image: postgres:15.2
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bd_demo
+      POSTGRES_USER: RubenDev
+      POSTGRES_PASSWORD: Demo123
+    ports:
+      - 5431:5431
+    expose:
+      - 5431
+    command: -p 5431
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U RubenDev -p 5431"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api-fastapi:
+    container_name: api-demo
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://RubenDev:Demo123@db-postgres:5431/bd_demo
+      API_HOST: 0.0.0.0
+      API_PORT: 8000
+      DEBUG: "True"
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000
+    ports:
+      - 8000:8000
+    depends_on:
+      db-postgres:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
