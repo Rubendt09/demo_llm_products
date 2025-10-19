@@ -30,5 +30,3 @@ npm run dev
 2. Crea una nueva API key
 3. Agrega `VITE_GEMINI_API_KEY=tu_key` en `.env`
 
-## 📖 Documentación Completa
-
