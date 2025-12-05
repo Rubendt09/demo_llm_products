@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  orchestrator:
+    build: .
+    container_name: llm-orchestrator
+    ports:
+      - "8001:8001"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PRODUCTS_API_URL=http://host.docker.internal:8000/api
+      - API_HOST=0.0.0.0
+      - API_PORT=8001
+      - CORS_ORIGINS=http://localhost:5173
+      - MAX_RECURSION_DEPTH=5
+      - MAX_HISTORY_LENGTH=20
+    restart: unless-stopped
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
